@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Калькулятор</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2em;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.8s ease;
+    }
+
+    .calculator {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 320px;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.8s ease;
+    }
+
+    .inputs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+
+    input[type="text"] {
+      width: 100px;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1em;
+      margin-bottom: 15px;
+      border-radius: 6px;
+    }
+
+    .result {
+      text-align: center;
+      font-size: 1.2em;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      background-color: #eee;
+      transition: background-color 0.5s;
+    }
+
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .keyboard button, .calculate-btn {
+      padding: 10px;
+      font-size: 1em;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .keyboard button:hover, .calculate-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .calculate-btn {
+      width: 100%;
+    }
+
+    .red-bg {
+      background-color: #ffcccc !important;
+      color: #b30000;
+    }
+
+    /* Анимация появления */
+    .show {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="animate">Простой калькулятор</h1>
+
+  <div class="calculator animate">
+    <div class="inputs">
+      <input type="text" id="num1" readonly placeholder="Число 1">
+      <input type="text" id="num2" readonly placeholder="Число 2">
+    </div>
+
+    <select id="operator">
+      <option value="+">+</option>
+      <option value="-">−</option>
+      <option value="*">*</option>
+      <option value="/">/</option>
+    </select>
+
+    <div class="result" id="result">Результат появится здесь</div>
+
+    <div class="keyboard">
+      <!-- Цифровая клавиатура -->
+      <button onclick="pressDigit(1)">1</button>
+      <button onclick="pressDigit(2)">2</button>
+      <button onclick="pressDigit(3)">3</button>
+      <button onclick="pressDigit(4)">4</button>
+      <button onclick="pressDigit(5)">5</button>
+      <button onclick="pressDigit(6)">6</button>
+      <button onclick="pressDigit(7)">7</button>
+      <button onclick="pressDigit(8)">8</button>
+      <button onclick="pressDigit(9)">9</button>
+      <button onclick="clearInput()">C</button>
+      <button onclick="pressDigit(0)">0</button>
+    </div>
+
+    <button class="calculate-btn" onclick="calculate()">Посчитать</button>
+  </div>
+
+  <script>
+    // Текущий фокус: num1 или num2
+    let activeInput = null;
+
+    // Установка активного поля ввода при клике
+    document.getElementById("num1").addEventListener("focus", () => {
+      activeInput = "num1";
+    });
+
+    document.getElementById("num2").addEventListener("focus", () => {
+      activeInput = "num2";
+    });
+
+    // Добавление цифры в выбранное поле
+    function pressDigit(digit) {
+      if (!activeInput) return;
+      const input = document.getElementById(activeInput);
+      input.value += digit;
+    }
+
+    // Очистка выбранного поля
+    function clearInput() {
+      if (!activeInput) return;
+      document.getElementById(activeInput).value = "";
+    }
+
+    // Вычисление результата
+    function calculate() {
+      const num1 = parseFloat(document.getElementById("num1").value);
+      const num2 = parseFloat(document.getElementById("num2").value);
+      const op = document.getElementById("operator").value;
+      const resultField = document.getElementById("result");
+
+      let result;
+
+      if (isNaN(num1) || isNaN(num2)) {
+        resultField.textContent = "Введите оба числа";
+        resultField.classList.remove("red-bg");
+        return;
+      }
+
+      switch (op) {
+        case "+": result = num1 + num2; break;
+        case "-": result = num1 - num2; break;
+        case "*": result = num1 * num2; break;
+        case "/": 
+          result = num2 !== 0 ? (num1 / num2) : "Деление на 0";
+          break;
+      }
+
+      if (typeof result === "number" && result > 15) {
+        resultField.textContent = result+" > 15";
+        resultField.classList.add("red-bg");
+      } else {
+        resultField.textContent = "Результат: " + result;
+        resultField.classList.remove("red-bg");
+      }
+    }
+
+    // Анимации при прокрутке
+    const animElems = document.querySelectorAll('.animate');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    }, { threshold: 0.2 });
+
+    animElems.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
